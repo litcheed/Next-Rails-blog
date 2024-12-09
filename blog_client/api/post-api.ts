@@ -13,4 +13,15 @@ export class PostsApi {
     }
   }
 
+  async deletePosts(id: number) {
+    try {
+      const res = await fetch(`http://localhost:3001/api/v1/posts/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        throw new Error(`Failed to delete post: ${res.status}`);
+      }
+    } catch(error) {
+      console.error(error)
+    }
+  }
+
 }
