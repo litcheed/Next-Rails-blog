@@ -1,27 +1,19 @@
 'use client';
 
+import { PostsApi } from "@/api/post-api";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
-
+  const postsApi = new PostsApi();
+  
   useEffect(() => {
-    async function  fetchPosts() {
-      try {
-        const res = await fetch("http://localhost:3001/api/v1/posts");
-        // if (!res.ok) {
-        //   throw new Error(`Failed to fetch posts: ${res.status}`);
-        // }
-        const data = await res.json();
-        setPosts(data);
-      } catch(error) {
-        console.error(error)
-      }
+    const fetchPosts = async() => {
+      const fetchedPosts = await postsApi.fetchPosts();
+      setPosts(fetchedPosts);
     }
-    
     fetchPosts();
   }, []);
-
 
   function deletePost(id: number) {
     console.log("削除実行")
