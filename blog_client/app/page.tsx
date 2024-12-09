@@ -1,12 +1,14 @@
 'use client';
 
 import { PostsApi } from "@/api/post-api";
+import { FromData } from "@/type/post";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [formData, setFormData] = useState<FromData>({ title: "", content: "" })
   const postsApi = new PostsApi();
-  
+
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -16,9 +18,26 @@ export default function Home() {
     setPosts(fetchedPosts);
   }
 
+  const createPost = async(formData: FromData) => {
+    console.log(JSON.stringify(formData))
+    await postsApi.createPost(formData);
+    fetchPosts();
+  }
+
   const deletePost = async (id: number) => {
     await postsApi.deletePosts(id)
     fetchPosts();
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value }));
+  }
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createPost(formData);
+    setFormData({ title: "", content: ""})
   }
   
   return (
@@ -33,6 +52,15 @@ export default function Home() {
               <button onClick={()=>deletePost(post.id)}>削除</button>
             </div>
           ))}
+        </div>
+        <div>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-5">
+              <div><input type="text" name="title" value={formData.title} onChange={handleChange} /></div>
+              <div><input type="text" name="content" value={formData.content} onChange={handleChange} /></div>
+              <button onClick={() => createPost(formData)}>投稿</button>
+            </div>
+          </form>
         </div>
       </main>
     </div>
