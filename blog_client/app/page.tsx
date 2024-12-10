@@ -1,12 +1,13 @@
 'use client';
 
 import { PostsApi } from "@/api/post-api";
-import { FromData } from "@/type/post";
+import { FormData } from "@/type/post";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
-  const [formData, setFormData] = useState<FromData>({ title: "", content: "" })
+  const [formData, setFormData] = useState<FormData>({ title: "", content: "" })
   const postsApi = new PostsApi();
 
   useEffect(() => {
@@ -18,14 +19,16 @@ export default function Home() {
     setPosts(fetchedPosts);
   }
 
-  const createPost = async(formData: FromData) => {
+  const createPost = async(formData: FormData) => {
     console.log(JSON.stringify(formData))
     await postsApi.createPost(formData);
+    alert("投稿を作成しました。");
     fetchPosts();
   }
 
   const deletePost = async (id: number) => {
-    await postsApi.deletePosts(id)
+    await postsApi.deletePosts(id);
+    alert("投稿を削除しました。");
     fetchPosts();
   }
 
@@ -41,19 +44,24 @@ export default function Home() {
   }
   
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div>
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+      {posts ? (
         <div>
           {posts.map((post: {id: number; title: string; content: string; updated_at: string;}) => (
-            <div key={post.id}>
+            <div key={post.id} className="mb-4 bg-gray">
               <div>{post.title}</div>
               <div>{post.content}</div>
               <div>{post.updated_at}</div>
               <button onClick={()=>deletePost(post.id)}>削除</button>
+              <button><Link href={`/${post.id}`}>編集</Link></button>
             </div>
           ))}
         </div>
-        <div>
+      ):(
+        <div>投稿が見つかりません</div>
+      )}
+        <div className="mt-4">
           <form onSubmit={handleSubmit}>
             <div className="space-y-5">
               <div><input type="text" name="title" value={formData.title} onChange={handleChange} /></div>
